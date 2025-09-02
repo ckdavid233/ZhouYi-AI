@@ -128,8 +128,6 @@ liuyao_streamlit/
 │   └── AI智能分析.py             # AI分析页面
 ├── yijing_core.py               # 易经核心算法
 ├── liuyao_data_extractor.py     # 六爻数据提取器
-├── coin_animation_test.py       # 铜钱动画测试文件
-├── test_number_divination.py    # 数字起卦测试
 ├── 提示词模板.md                # AI提示词模板
 └── pycache /                 # Python缓存目录
 

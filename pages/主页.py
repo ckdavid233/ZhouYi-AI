@@ -7,7 +7,7 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from yijing_core import YijingCore, create_session_state
-
+from liuyao_formatter import LiuyaoFormatter
 # 页面配置
 st.set_page_config(
     page_title="主页",
@@ -50,9 +50,15 @@ st.markdown("""
         border-radius: 5px;
     }
     .moving-line {
+        font-family: '等线', monospace;
+        font-size: 1.2em;
+        font-weight: bold;
+        margin: 5px 0;
+        padding: 8px;
         color: #ff6b6b;
         background: rgba(255,107,107,0.2) !important;
         border-left: 4px solid #ff6b6b;
+        border-radius: 5px;
     }
     .method-button {
         margin: 10px 0;
@@ -766,7 +772,8 @@ with col2:
                 st.markdown("### 📊 卦象详细信息")
                 
                 # 基本信息
-                detail_text = st.session_state.yijing_core.get_detailed_analysis(result, changed_result)
+                formatter = LiuyaoFormatter(st.session_state.yijing_core)
+                detail_text = formatter.get_detailed_analysis(result, changed_result)
                 st.markdown(f"<div class='detail-box'>{detail_text}</div>", unsafe_allow_html=True)
                 
                 # 六亲六神详细信息
@@ -893,7 +900,8 @@ with col2:
             except Exception as e:
                 # 如果获取详细分析失败，显示基本信息
                 st.error(f"获取详细分析失败：{str(e)}")
-                detail_text = st.session_state.yijing_core.get_detailed_analysis(result, changed_result)
+                formatter = LiuyaoFormatter(st.session_state.yijing_core)
+                detail_text = formatter.get_detailed_analysis(result, changed_result)
                 st.markdown(f"<div class='detail-box'>{detail_text}</div>", unsafe_allow_html=True)
         
         # 重新起卦按钮
