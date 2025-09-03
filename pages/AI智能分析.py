@@ -696,13 +696,20 @@ else:
                 for i, line in enumerate(all_lines):
                     line_num = 6 - i
                     is_dong = line_num == gua_data['dong_yao']
-                    dong_text = " ◄动爻" if is_dong else ""
+                    if is_dong:
+                        if line == '━━━':  
+                            dong_text = " ◄动爻⭕"
+                        else:  
+                            dong_text = " ◄动爻❌"
+                    else:
+                        dong_text = ""
                     
                     # 获取详细信息
                     yao_index = line_num - 1
                     liushen = complete_analysis['liushen'][5-yao_index]
                     liuqin = complete_analysis['liuqin'][5-yao_index]
                     najia = complete_analysis['najia_dizhi'][5-yao_index]
+                    wuxing = complete_analysis['wuxing'][5-yao_index]
                     
                     # 世应标记
                     shi_ying_mark = ""
@@ -712,7 +719,7 @@ else:
                         shi_ying_mark = " 【应】"
                     
                     # 显示完整信息
-                    detail_info = f" {liuqin} {najia}{shi_ying_mark}"
+                    detail_info = f" {liuqin} {najia}{wuxing}{shi_ying_mark}"
                     css_class = "yao-detail dong-yao" if is_dong else "yao-detail"
                     st.markdown(f"<div class='{css_class}'>{liushen}  第{line_num}爻：{line} | {detail_info}{dong_text}</div>", unsafe_allow_html=True)
                     
@@ -725,14 +732,21 @@ else:
                 for i, line in enumerate(all_lines):
                     line_num = 6 - i
                     is_dong = line_num == gua_data['dong_yao']
-                    dong_text = " ◄动爻" if is_dong else ""
+                    if is_dong:
+                        if line == '━━━':  
+                            dong_text = " ◄动爻⭕"
+                        else:  
+                            dong_text = " ◄动爻❌"
+                    else:
+                        dong_text = ""
                     
                     # 获取详细信息
                     yao_index = line_num - 1
                     liushen = complete_analysis['liushen'][5-yao_index]
                     liuqin = complete_analysis['liuqin'][5-yao_index]
                     najia = complete_analysis['najia_dizhi'][5-yao_index]
-                    
+                    wuxing = complete_analysis['wuxing'][5-yao_index]
+
                     # 世应标记
                     shi_ying_mark = ""
                     if line_num == complete_analysis['shi_ying_positions']['shi']:
@@ -741,7 +755,7 @@ else:
                         shi_ying_mark = " 【应】"
                     
                     # 显示完整信息
-                    detail_info = f"{liuqin} {najia}{shi_ying_mark}"
+                    detail_info = f"{liuqin} {najia}{wuxing}{shi_ying_mark}"
                     css_class = "yao-detail dong-yao" if is_dong else "yao-detail"
                     st.markdown(f"<div class='{css_class}'>{liushen}  第{line_num}爻：{line} | {detail_info}{dong_text}</div>", unsafe_allow_html=True)
                     
@@ -758,7 +772,7 @@ else:
                     liushen = complete_analysis['liushen'][5-yao_index]
                     liuqin = complete_analysis['liuqin'][5-yao_index]
                     najia = complete_analysis['najia_dizhi'][5-yao_index]
-                    
+                    wuxing = complete_analysis['wuxing'][5-yao_index]
                     # 世应标记
                     shi_ying_mark = ""
                     if line_num == complete_analysis['shi_ying_positions']['shi']:
@@ -767,7 +781,7 @@ else:
                         shi_ying_mark = " 【应】"
                     
                     # 显示完整信息
-                    detail_info = f"{liuqin} {najia}{shi_ying_mark}"
+                    detail_info = f"{liuqin} {najia}{wuxing}{shi_ying_mark}"
                     css_class = "yao-detail dong-yao" if is_moving else "yao-detail"
                     st.markdown(f"<div class='{css_class}'>{liushen}  第{line_num}爻：{line} | {detail_info}{dong_text}</div>", unsafe_allow_html=True)
         
@@ -793,7 +807,8 @@ else:
                     liushen = changed_analysis['liushen'][5-yao_index]
                     liuqin = changed_analysis['liuqin'][5-yao_index]
                     najia = changed_analysis['najia_dizhi'][5-yao_index]
-                    
+                    wuxing = changed_analysis['wuxing'][5-yao_index]
+
                     # 世应标记
                     shi_ying_mark = ""
                     if line_num == changed_analysis['shi_ying_positions']['shi']:
@@ -802,7 +817,7 @@ else:
                         shi_ying_mark = " 【应】"
                     
                     # 显示完整信息
-                    detail_info = f"{liuqin} {najia}{shi_ying_mark}"
+                    detail_info = f"{liuqin} {najia}{wuxing}{shi_ying_mark}"
                     st.markdown(f"<div class='yao-detail'>{liushen}  第{line_num}爻：{line} | {detail_info}</div>", unsafe_allow_html=True)
             else:
                 # 时间起卦和数字起卦的变卦显示
@@ -818,7 +833,8 @@ else:
                     liushen = changed_analysis['liushen'][5-yao_index]
                     liuqin = changed_analysis['liuqin'][5-yao_index]
                     najia = changed_analysis['najia_dizhi'][5-yao_index]
-                    
+                    wuxing = changed_analysis['wuxing'][5-yao_index]
+
                     # 世应标记
                     shi_ying_mark = ""
                     if line_num == changed_analysis['shi_ying_positions']['shi']:
@@ -827,110 +843,110 @@ else:
                         shi_ying_mark = " 【应】"
                     
                     # 显示完整信息
-                    detail_info = f"{liuqin} {najia}{shi_ying_mark}"
+                    detail_info = f"{liuqin} {najia}{wuxing}{shi_ying_mark}"
                     st.markdown(f"<div class='yao-detail'>{liushen}  第{line_num}爻：{line} | {detail_info}</div>", unsafe_allow_html=True)
         
         st.markdown("</div>", unsafe_allow_html=True)
-    # col1, col2, col3 = st.columns([2, 2, 2])
+    col1, col2, col3 = st.columns([2, 2, 2])
     
-    # with col1:
-    #     if st.button("🚀 开始AI分析", key="analyze_button", disabled=st.session_state.ai_analyzing):
-    #         if not question:
-    #             st.warning("建议输入问题以获得更精准的分析")
-    #         # 开始AI分析
-    #         st.session_state.ai_analyzing = True
+    with col1:
+        if st.button("🚀 开始AI分析", key="analyze_button", disabled=st.session_state.ai_analyzing):
+            if not question:
+                st.warning("建议输入问题以获得更精准的分析")
+            # 开始AI分析
+            st.session_state.ai_analyzing = True
             
-    #         try:
-    #             # 生成提示词
-    #             prompt = generate_ai_prompt(gua_data, complete_analysis, changed_gua_data, question)
-    #             st.session_state.prompt_preview = prompt
+            try:
+                # 生成提示词
+                prompt = generate_ai_prompt(gua_data, complete_analysis, changed_gua_data, question)
+                st.session_state.prompt_preview = prompt
                 
-    #             # 显示结果标题
-    #             st.markdown("### 📝 AI分析结果")
+                # 显示结果标题
+                st.markdown("### 📝 AI分析结果")
                 
-    #             # 发送请求到AI模型并流式显示结果
-    #             with st.spinner("正在调用AI模型进行分析，请稍候..."):
-    #                 response = send_to_ai_model_streaming(prompt)
+                # 发送请求到AI模型并流式显示结果
+                with st.spinner("正在调用AI模型进行分析，请稍候..."):
+                    response = send_to_ai_model_streaming(prompt)
                     
-    #             st.session_state.ai_analyzing = False
+                st.session_state.ai_analyzing = False
                 
-    #         except Exception as e:
-    #             st.session_state.ai_analyzing = False
-    #             st.error(f"AI分析失败：{str(e)}")
+            except Exception as e:
+                st.session_state.ai_analyzing = False
+                st.error(f"AI分析失败：{str(e)}")
     
-    # with col2:
-    #     # 显示重新分析按钮
-    #     if st.session_state.ai_analysis_result:
-    #         if st.button("🔄 重新分析"):
-    #             st.session_state.ai_analysis_result = None
-    #             st.session_state.prompt_preview = None
-    #             st.session_state.show_prompt = False
-    #             st.rerun()
+    with col2:
+        # 显示重新分析按钮
+        if st.session_state.ai_analysis_result:
+            if st.button("🔄 重新分析"):
+                st.session_state.ai_analysis_result = None
+                st.session_state.prompt_preview = None
+                st.session_state.show_prompt = False
+                st.rerun()
     
-    # with col3:
-    #     # 显示提示词查看按钮
-    #     if st.session_state.prompt_preview:
-    #         if st.button("👁️ 查看提示词" if not st.session_state.show_prompt else "🙈 隐藏提示词"):
-    #             st.session_state.show_prompt = not st.session_state.show_prompt
-    #             st.rerun()
+    with col3:
+        # 显示提示词查看按钮
+        if st.session_state.prompt_preview:
+            if st.button("👁️ 查看提示词" if not st.session_state.show_prompt else "🙈 隐藏提示词"):
+                st.session_state.show_prompt = not st.session_state.show_prompt
+                st.rerun()
     
-    # # 提示词预览区域
-    # if st.session_state.show_prompt and st.session_state.prompt_preview:
-    #     st.markdown("### 📋 发送给AI的提示词")
-    #     st.markdown(
-    #         f"""<div style='
-    #             white-space: pre-wrap; 
-    #             line-height: 1.6; 
-    #             color: #333;
-    #             background: #f8f9fa;
-    #             padding: 20px;
-    #             border-radius: 8px;
-    #             border: 1px solid #e9ecef;
-    #             font-size: 14px;
-    #             font-family: monospace;
-    #             max-height: 400px;
-    #             overflow-y: auto;
-    #         '>{st.session_state.prompt_preview}</div>""",
-    #         unsafe_allow_html=True
-    #     )
-    #     st.caption("💡 这是即将发送给AI模型的完整提示词内容，您可以检查其准确性")
+    # 提示词预览区域
+    if st.session_state.show_prompt and st.session_state.prompt_preview:
+        st.markdown("### 📋 发送给AI的提示词")
+        st.markdown(
+            f"""<div style='
+                white-space: pre-wrap; 
+                line-height: 1.6; 
+                color: #333;
+                background: #f8f9fa;
+                padding: 20px;
+                border-radius: 8px;
+                border: 1px solid #e9ecef;
+                font-size: 14px;
+                font-family: monospace;
+                max-height: 400px;
+                overflow-y: auto;
+            '>{st.session_state.prompt_preview}</div>""",
+            unsafe_allow_html=True
+        )
+        st.caption("💡 这是即将发送给AI模型的完整提示词内容，您可以检查其准确性")
     
-    # # 显示AI分析结果
+    # 显示AI分析结果
     # if st.session_state.ai_analysis_result:
     #     st.markdown("### 📝 AI分析结果")
     #     st.markdown(
     #         f"<div class='result-box'>{st.session_state.ai_analysis_result}</div>",
     #         unsafe_allow_html=True
     #     )
-    # AI分析按钮
-    if st.button("🚀 开始AI分析", key="analyze_button", disabled=st.session_state.ai_analyzing):
-        if not question:
-            st.warning("建议输入问题以获得更精准的分析")
-        # 开始AI分析
-        st.session_state.ai_analyzing = True
+    # # AI分析按钮
+    # if st.button("🚀 开始AI分析", key="analyze_button", disabled=st.session_state.ai_analyzing):
+    #     if not question:
+    #         st.warning("建议输入问题以获得更精准的分析")
+    #     # 开始AI分析
+    #     st.session_state.ai_analyzing = True
         
-        try:
-            # 生成提示词
-            prompt = generate_ai_prompt(gua_data, complete_analysis, changed_gua_data, question)
+    #     try:
+    #         # 生成提示词
+    #         prompt = generate_ai_prompt(gua_data, complete_analysis, changed_gua_data, question)
             
-            # 显示结果标题
-            st.markdown("### 📝 AI分析结果")
+    #         # 显示结果标题
+    #         st.markdown("### 📝 AI分析结果")
             
-            # 发送请求到AI模型并流式显示结果
-            with st.spinner("正在调用AI模型进行分析，请稍候..."):
-                response = send_to_ai_model_streaming(prompt)
+    #         # 发送请求到AI模型并流式显示结果
+    #         with st.spinner("正在调用AI模型进行分析，请稍候..."):
+    #             response = send_to_ai_model_streaming(prompt)
                 
-            st.session_state.ai_analyzing = False
+    #         st.session_state.ai_analyzing = False
             
-        except Exception as e:
-            st.session_state.ai_analyzing = False
-            st.error(f"AI分析失败：{str(e)}")
+    #     except Exception as e:
+    #         st.session_state.ai_analyzing = False
+    #         st.error(f"AI分析失败：{str(e)}")
     
-    # 显示重新分析按钮
-    if st.session_state.ai_analysis_result:
-        if st.button("🔄 重新分析"):
-            st.session_state.ai_analysis_result = None
-            st.rerun()
+    # # 显示重新分析按钮
+    # if st.session_state.ai_analysis_result:
+    #     if st.button("🔄 重新分析"):
+    #         st.session_state.ai_analysis_result = None
+    #         st.rerun()
 
 
 # 页脚

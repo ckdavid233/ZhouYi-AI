@@ -11,7 +11,7 @@ class LiuyaoFormatter:
         """
         self.yijing_core = yijing_core
     
-    def get_detailed_analysis(self, result: Dict, changed_result: Dict) -> str:
+    def get_detailed_analysis(self, result: Dict, changed_result: Dict, complete_analysis: Dict = None, changed_complete_analysis: Dict = None) -> str:
         """获取详细分析文本"""
         detail_text = f"""
 ═══════════════════════════════════════════════
@@ -34,16 +34,54 @@ class LiuyaoFormatter:
     上卦：{changed_result['upper_gua']}
     下卦：{changed_result['lower_gua']}
 
-【卦象分析】：
-    本卦六爻从第六爻到第一爻呈现分别为："""
+【本卦六爻详细配置】："""
             
-            # 显示六爻详情
-            all_lines = self.yijing_core.bagua_symbols[result['upper_gua']] + self.yijing_core.bagua_symbols[result['lower_gua']]
-            for i in range(6):
-                line_num = 6 - i
-                line = all_lines[i]
-                is_dong = line_num == result['dong_yao']
-                detail_text += f"\n    第{line_num}爻：{line} {'← 动爻' if is_dong else ''}"
+            # 显示六爻详情 - 包含完整信息
+            if complete_analysis:
+                all_lines = self.yijing_core.bagua_symbols[result['upper_gua']] + self.yijing_core.bagua_symbols[result['lower_gua']]
+                for i in range(6):
+                    line_num = 6 - i
+                    line = all_lines[i]
+                    is_dong = line_num == result['dong_yao']
+                    yao_index = line_num - 1
+                    
+                    # 世应标记
+                    shi_ying_mark = ""
+                    if line_num == complete_analysis['shi_ying_positions']['shi']:
+                        shi_ying_mark = "【世】"
+                    elif line_num == complete_analysis['shi_ying_positions']['ying']:
+                        shi_ying_mark = "【应】"
+                    
+                    dong_text = "◄动爻" if is_dong else ""
+                    
+                    detail_text += f"\n第{line_num}爻：{line} | {complete_analysis['liushen'][5-yao_index]} {complete_analysis['liuqin'][5-yao_index]} {complete_analysis['najia_dizhi'][5-yao_index]}({complete_analysis['wuxing'][5-yao_index]}) {shi_ying_mark} {dong_text}"
+            else:
+                # 如果没有完整分析数据，使用原来的简单显示
+                all_lines = self.yijing_core.bagua_symbols[result['upper_gua']] + self.yijing_core.bagua_symbols[result['lower_gua']]
+                for i in range(6):
+                    line_num = 6 - i
+                    line = all_lines[i]
+                    is_dong = line_num == result['dong_yao']
+                    detail_text += f"\n    第{line_num}爻：{line} {'← 动爻' if is_dong else ''}"
+            
+            # 添加变卦信息
+            if changed_complete_analysis:
+                detail_text += f"\n\n【变卦六爻详细配置】："
+                changed_lines = changed_result.get('lines', [])
+                if changed_lines:
+                    for i in range(6):
+                        line_num = 6 - i
+                        line = changed_lines[5-i]  # 反转索引
+                        yao_index = line_num - 1
+                        
+                        # 世应标记
+                        shi_ying_mark = ""
+                        if line_num == changed_complete_analysis['shi_ying_positions']['shi']:
+                            shi_ying_mark = "【世】"
+                        elif line_num == changed_complete_analysis['shi_ying_positions']['ying']:
+                            shi_ying_mark = "【应】"
+                        
+                        detail_text += f"\n第{line_num}爻：{line} | {changed_complete_analysis['liushen'][5-yao_index]} {changed_complete_analysis['liuqin'][5-yao_index]} {changed_complete_analysis['najia_dizhi'][5-yao_index]}({changed_complete_analysis['wuxing'][5-yao_index]}) {shi_ying_mark}"
         
         elif result['method'] == 'number':
             detail_text += f"""【数字信息】：{result['numbers_info']}
@@ -57,15 +95,52 @@ class LiuyaoFormatter:
     上卦：{changed_result['upper_gua']}
     下卦：{changed_result['lower_gua']}
 
-【卦象分析】：
-    本卦六爻从下到上分别为："""
+【本卦六爻详细配置】："""
             
             # 显示六爻详情 - 从第六爻到第一爻显示
-            for i in range(5, -1, -1):
-                line = result['hexagram'][i]
-                is_moving = result['moving_lines'][i]
-                line_num = i + 1
-                detail_text += f"\n    第{line_num}爻：{line} {'← 动爻' if is_moving else ''}"
+            if complete_analysis:
+                for i in range(5, -1, -1):
+                    line = result['hexagram'][i]
+                    is_moving = result['moving_lines'][i]
+                    line_num = i + 1
+                    yao_index = line_num - 1
+                    
+                    # 世应标记
+                    shi_ying_mark = ""
+                    if line_num == complete_analysis['shi_ying_positions']['shi']:
+                        shi_ying_mark = "【世】"
+                    elif line_num == complete_analysis['shi_ying_positions']['ying']:
+                        shi_ying_mark = "【应】"
+                    
+                    dong_text = "◄动爻" if is_moving else ""
+                    
+                    detail_text += f"\n第{line_num}爻：{line} | {complete_analysis['liushen'][5-yao_index]} {complete_analysis['liuqin'][5-yao_index]} {complete_analysis['najia_dizhi'][5-yao_index]}({complete_analysis['wuxing'][5-yao_index]}) {shi_ying_mark} {dong_text}"
+            else:
+                # 如果没有完整分析数据，使用原来的简单显示
+                for i in range(5, -1, -1):
+                    line = result['hexagram'][i]
+                    is_moving = result['moving_lines'][i]
+                    line_num = i + 1
+                    detail_text += f"\n    第{line_num}爻：{line} {'← 动爻' if is_moving else ''}"
+            
+            # 添加变卦信息
+            if changed_complete_analysis:
+                detail_text += f"\n\n【变卦六爻详细配置】："
+                changed_lines = changed_result.get('lines', [])
+                if changed_lines:
+                    for i in range(6):
+                        line_num = 6 - i
+                        line = changed_lines[5-i]  # 反转索引
+                        yao_index = line_num - 1
+                        
+                        # 世应标记
+                        shi_ying_mark = ""
+                        if line_num == changed_complete_analysis['shi_ying_positions']['shi']:
+                            shi_ying_mark = "【世】"
+                        elif line_num == changed_complete_analysis['shi_ying_positions']['ying']:
+                            shi_ying_mark = "【应】"
+                        
+                        detail_text += f"\n第{line_num}爻：{line} | {changed_complete_analysis['liushen'][5-yao_index]} {changed_complete_analysis['liuqin'][5-yao_index]} {changed_complete_analysis['najia_dizhi'][5-yao_index]}({changed_complete_analysis['wuxing'][5-yao_index]}) {shi_ying_mark}"
         
         else:  # coin method
             detail_text += f"""【本卦】：《{result['original_gua']}》
@@ -96,8 +171,46 @@ class LiuyaoFormatter:
                 else:
                     nature = "老阴(动爻)"
                 
-                detail_text += f"""
-    第{line_num}爻：{' '.join(coin_result)} → {line} ({nature})"""
+                detail_text += f"\n    第{line_num}爻：{' '.join(coin_result)} → {line} ({nature})"
+            
+            # 添加完整的六爻配置
+            if complete_analysis:
+                detail_text += f"\n\n【本卦六爻详细配置】："
+                for i in range(5, -1, -1):
+                    line = result['hexagram'][i]
+                    is_moving = result['moving_lines'][i]
+                    line_num = i + 1
+                    yao_index = line_num - 1
+                    
+                    # 世应标记
+                    shi_ying_mark = ""
+                    if line_num == complete_analysis['shi_ying_positions']['shi']:
+                        shi_ying_mark = "【世】"
+                    elif line_num == complete_analysis['shi_ying_positions']['ying']:
+                        shi_ying_mark = "【应】"
+                    
+                    dong_text = "◄动爻" if is_moving else ""
+                    
+                    detail_text += f"\n第{line_num}爻：{line} | {complete_analysis['liushen'][5-yao_index]} {complete_analysis['liuqin'][5-yao_index]} {complete_analysis['najia_dizhi'][5-yao_index]}({complete_analysis['wuxing'][5-yao_index]}) {shi_ying_mark} {dong_text}"
+            
+            # 添加变卦信息
+            if changed_complete_analysis:
+                detail_text += f"\n\n【变卦六爻详细配置】："
+                changed_lines = changed_result.get('lines', [])
+                if changed_lines:
+                    for i in range(6):
+                        line_num = 6 - i
+                        line = changed_lines[5-i]  # 反转索引
+                        yao_index = line_num - 1
+                        
+                        # 世应标记
+                        shi_ying_mark = ""
+                        if line_num == changed_complete_analysis['shi_ying_positions']['shi']:
+                            shi_ying_mark = "【世】"
+                        elif line_num == changed_complete_analysis['shi_ying_positions']['ying']:
+                            shi_ying_mark = "【应】"
+                        
+                        detail_text += f"\n第{line_num}爻：{line} | {changed_complete_analysis['liushen'][5-yao_index]} {changed_complete_analysis['liuqin'][5-yao_index]} {changed_complete_analysis['najia_dizhi'][5-yao_index]}({changed_complete_analysis['wuxing'][5-yao_index]}) {shi_ying_mark}"
             
             detail_text += f"\n\n【动爻分析】："
             moving_count = sum(result['moving_lines'])

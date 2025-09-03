@@ -557,13 +557,20 @@ with col2:
                         line_num = 6 - i
                         is_dong = line_num == result['dong_yao']
                         css_class = "moving-line" if is_dong else "hexagram-line"
-                        dong_text = " ◄动爻" if is_dong else ""
+                        if is_dong:
+                            if line == '━━━':  
+                                dong_text = " ◄动爻⭕"
+                            else:  
+                                dong_text = " ◄动爻❌"
+                        else:
+                            dong_text = ""
                         
                         # 获取详细信息
                         yao_index = line_num - 1  # 转换为0-5索引
                         liushen = complete_analysis['liushen'][5-yao_index]  # 六神数组是正序的
                         liuqin = complete_analysis['liuqin'][5-yao_index]    # 六亲数组是正序的
                         najia = complete_analysis['najia_dizhi'][5-yao_index] # 纳甲数组是正序的
+                        wuxing = complete_analysis['wuxing'][5-yao_index]
                         
                         # 世应标记
                         shi_ying_mark = ""
@@ -573,7 +580,7 @@ with col2:
                             shi_ying_mark = " 【应】"
                         
                         # 显示完整信息
-                        detail_info = f" {liuqin} {najia}{shi_ying_mark}"
+                        detail_info = f" {liuqin} {najia}{wuxing}{shi_ying_mark}"
                         st.markdown(f"<div class='{css_class}'>{liushen}  第{line_num}爻：{line} | {detail_info}{dong_text}</div>", unsafe_allow_html=True)
                     
                 elif result['method'] == 'number':
@@ -587,13 +594,20 @@ with col2:
                         line_num = 6 - i
                         is_dong = line_num == result['dong_yao']
                         css_class = "moving-line" if is_dong else "hexagram-line"
-                        dong_text = " ◄动爻" if is_dong else ""
+                        if is_dong:
+                            if line == '━━━':  
+                                dong_text = " ◄动爻⭕"
+                            else:  
+                                dong_text = " ◄动爻❌"
+                        else:
+                            dong_text = ""
                         
                         # 获取详细信息
                         yao_index = line_num - 1
                         liushen = complete_analysis['liushen'][5-yao_index]
                         liuqin = complete_analysis['liuqin'][5-yao_index]
                         najia = complete_analysis['najia_dizhi'][5-yao_index]
+                        wuxing = complete_analysis['wuxing'][5-yao_index]
                         
                         # 世应标记
                         shi_ying_mark = ""
@@ -603,7 +617,7 @@ with col2:
                             shi_ying_mark = " 【应】"
                         
                         # 显示完整信息
-                        detail_info = f"{liuqin} {najia}{shi_ying_mark}"
+                        detail_info = f"{liuqin} {najia}{wuxing}{shi_ying_mark}"
                         st.markdown(f"<div class='{css_class}'>{liushen}  第{line_num}爻：{line} | {detail_info}{dong_text}</div>", unsafe_allow_html=True)
                     
                 else:  # coin method
@@ -628,6 +642,7 @@ with col2:
                         liushen = complete_analysis['liushen'][5-yao_index]
                         liuqin = complete_analysis['liuqin'][5-yao_index]
                         najia = complete_analysis['najia_dizhi'][5-yao_index]
+                        wuxing = complete_analysis['wuxing'][5-yao_index]
                         
                         # 世应标记
                         shi_ying_mark = ""
@@ -637,7 +652,7 @@ with col2:
                             shi_ying_mark = " 【应】"
                         
                         # 显示完整信息
-                        detail_info = f"{liuqin} {najia}{shi_ying_mark}"
+                        detail_info = f"{liuqin} {najia}{wuxing}{shi_ying_mark}"
                         st.markdown(f"<div class='{css_class}'>{liushen}  第{line_num}爻：{line} | {detail_info}{dong_text}</div>", unsafe_allow_html=True)
                 
             except Exception as e:
@@ -702,7 +717,8 @@ with col2:
                         liushen = changed_analysis['liushen'][5-yao_index]
                         liuqin = changed_analysis['liuqin'][5-yao_index]
                         najia = changed_analysis['najia_dizhi'][5-yao_index]
-                        
+                        wuxing = changed_analysis['wuxing'][5-yao_index]
+
                         # 世应标记
                         shi_ying_mark = ""
                         if line_num == changed_analysis['shi_ying_positions']['shi']:
@@ -711,7 +727,7 @@ with col2:
                             shi_ying_mark = " 【应】"
                         
                         # 显示完整信息
-                        detail_info = f"{liuqin} {najia}{shi_ying_mark}"
+                        detail_info = f"{liuqin} {najia}{wuxing}{shi_ying_mark}"
                         st.markdown(f"<div class='hexagram-line'>{liushen}  第{line_num}爻：{line} | {detail_info}</div>", unsafe_allow_html=True)
                 else:
                     # 时间起卦和数字起卦的变卦显示
@@ -727,7 +743,8 @@ with col2:
                         liushen = changed_analysis['liushen'][5-yao_index]
                         liuqin = changed_analysis['liuqin'][5-yao_index]
                         najia = changed_analysis['najia_dizhi'][5-yao_index]
-                        
+                        wuxing = changed_analysis['wuxing'][5-yao_index]
+
                         # 世应标记
                         shi_ying_mark = ""
                         if line_num == changed_analysis['shi_ying_positions']['shi']:
@@ -736,7 +753,7 @@ with col2:
                             shi_ying_mark = " 【应】"
                         
                         # 显示完整信息
-                        detail_info = f"{liuqin} {najia}{shi_ying_mark}"
+                        detail_info = f"{liuqin} {najia}{wuxing}{shi_ying_mark}"
                         st.markdown(f"<div class='hexagram-line'>{liushen}  第{line_num}爻：{line} | {detail_info}</div>", unsafe_allow_html=True)
                         
             except Exception as e:
@@ -822,6 +839,11 @@ with col2:
                             dong_mark = "❌老阴"
                         else:
                             dong_mark = "动"  # 理论上不会出现
+                    elif (result['method'] in ['time','number']) and is_dong:
+                        if yao_symbol == '━━━': 
+                            dong_mark = "⭕老阳"
+                        else:  
+                            dong_mark = "❌老阴"
                     else:
                         dong_mark = "动" if is_dong else ""
                     
@@ -831,8 +853,10 @@ with col2:
                         "六神": complete_analysis['liushen'][i],
                         "六亲": complete_analysis['liuqin'][i],
                         "纳甲": complete_analysis['najia_dizhi'][i],
+                        "五行": complete_analysis['wuxing'][i],
                         "世应": shi_ying,
-                        "动静": dong_mark
+                        "动静": dong_mark,
+                        
                     })
                 
                 # 显示表格
@@ -890,6 +914,7 @@ with col2:
                             "六神": changed_analysis['liushen'][i],
                             "六亲": changed_analysis['liuqin'][i],
                             "纳甲": changed_analysis['najia_dizhi'][i],
+                            "五行": changed_analysis['wuxing'][i],
                             "世应": shi_ying
                         })
                     
