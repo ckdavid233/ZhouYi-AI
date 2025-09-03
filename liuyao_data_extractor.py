@@ -2,32 +2,108 @@ import json
 from yijing_core import YijingCore
 
 def extract_liuyao_data(gua_data, complete_analysis, changed_gua_data, question):
-    basic_info = {
-        "起卦方法": get_method_name(gua_data['method']),
-        "本卦":{
-            "卦名": gua_data['original_gua'],
-            "上卦": gua_data['upper_gua'],
-            "下卦": gua_data['lower_gua']
-        },
-        "变卦":{
-            "卦名": changed_gua_data['name'],
-            "上卦": changed_gua_data['upper_gua'],
-            "下卦": changed_gua_data['lower_gua']
-        },
-        "用户问题": question if question else "无特定问题"
-    }
-    dong_yao_info = extract_moving_lines(gua_data)
-    liu_yao_details = extract_liuyao_details(gua_data, complete_analysis)
-    shi_ying = {
-        "世爻位置": complete_analysis['shi_ying_positions']['shi'],
-        "应爻位置": complete_analysis['shi_ying_positions']['ying']
-    }
-    return {
-        "基本信息": basic_info,
-        "动爻信息": dong_yao_info,
-        "爻位分析": liu_yao_details,
-        "世应关系": shi_ying
-    }
+    """提取六爻数据的主函数"""
+    try:
+        # 详细的数据验证
+        if not isinstance(gua_data, dict):
+            raise ValueError(f"gua_data必须是字典类型，当前类型: {type(gua_data)}")
+        
+        if 'original_gua' not in gua_data:
+            raise ValueError(f"gua_data缺少'original_gua'字段，当前字段: {list(gua_data.keys())}")
+        
+        if not isinstance(changed_gua_data, dict):
+            raise ValueError(f"changed_gua_data必须是字典类型，当前类型: {type(changed_gua_data)}")
+        
+        if 'name' not in changed_gua_data:
+            raise ValueError(f"changed_gua_data缺少'name'字段，当前字段: {list(changed_gua_data.keys())}")
+        
+        if not isinstance(complete_analysis, dict):
+            raise ValueError(f"complete_analysis必须是字典类型，当前类型: {type(complete_analysis)}")
+        
+        # 获取变卦的完整分析（包括变卦的世应位置）
+        yijing_core = YijingCore()
+        
+        # 为变卦创建正确的数据结构
+        changed_gua_for_analysis = {
+            'original_gua': changed_gua_data['name'],
+            'upper_gua': changed_gua_data['upper_gua'],
+            'lower_gua': changed_gua_data['lower_gua'],
+            'method': gua_data['method']
+        }
+        
+        # 如果是铜钱起卦，添加hexagram字段
+        if gua_data['method'] == 'coin' and 'lines' in changed_gua_data:
+            changed_gua_for_analysis['hexagram'] = changed_gua_data['lines']
+        
+        changed_complete_analysis = yijing_core.get_complete_analysis(
+            changed_gua_for_analysis, 
+            yijing_core.get_current_tiangan()
+        )
+        
+        # 构建基本信息
+        basic_info = {
+            "起卦方法": get_method_name(gua_data['method']),
+            "本卦": {
+                "卦名": gua_data['original_gua'],
+                "上卦": gua_data['upper_gua'],
+                "下卦": gua_data['lower_gua']
+            },
+            "变卦": {
+                "卦名": changed_gua_data['name'],
+                "上卦": changed_gua_data['upper_gua'],
+                "下卦": changed_gua_data['lower_gua']
+            },
+            "用户问题": question if question else "无特定问题"
+        }
+        
+        # 提取动爻信息
+        dong_yao_info = extract_moving_lines(gua_data)
+        
+        # 提取本卦六爻详细信息
+        liu_yao_details = extract_liuyao_details(gua_data, complete_analysis)
+        
+        # 本卦世应关系
+        ben_gua_shi_ying = {
+            "世爻位置": complete_analysis['shi_ying_positions']['shi'],
+            "应爻位置": complete_analysis['shi_ying_positions']['ying']
+        }
+        
+        # 变卦世应关系
+        bian_gua_shi_ying = {
+            "世爻位置": changed_complete_analysis['shi_ying_positions']['shi'],
+            "应爻位置": changed_complete_analysis['shi_ying_positions']['ying']
+        }
+        
+        # 变卦六爻详细信息
+        bian_gua_liu_yao_details = extract_changed_gua_details(changed_gua_data, changed_complete_analysis, gua_data['method'])
+        
+        return {
+            "基本信息": basic_info,
+            "动爻信息": dong_yao_info,
+            "爻位分析": liu_yao_details,
+            "世应关系": ben_gua_shi_ying,
+            "变卦世应关系": bian_gua_shi_ying,
+            "变卦爻位分析": bian_gua_liu_yao_details
+        }
+        
+    except Exception as e:
+        # 更详细的错误信息
+        error_msg = f"数据提取失败: {str(e)}\n"
+        error_msg += f"gua_data类型: {type(gua_data)}, 内容: {gua_data}\n"
+        error_msg += f"changed_gua_data类型: {type(changed_gua_data)}, 内容: {changed_gua_data}\n"
+        error_msg += f"complete_analysis类型: {type(complete_analysis)}"
+        
+        # 如果是KeyError，提供更具体的信息
+        if isinstance(e, KeyError):
+            error_msg += f"\n缺少的键: {str(e)}"
+            if hasattr(e, 'args') and e.args:
+                missing_key = e.args[0]
+                if 'gua_data' in locals() and isinstance(gua_data, dict):
+                    error_msg += f"\ngua_data可用键: {list(gua_data.keys())}"
+                if 'changed_gua_data' in locals() and isinstance(changed_gua_data, dict):
+                    error_msg += f"\nchanged_gua_data可用键: {list(changed_gua_data.keys())}"
+        
+        raise ValueError(error_msg)
 
 def get_method_name(method):
     method_map = {
@@ -78,6 +154,35 @@ def extract_liuyao_details(gua_data, complete_analysis):
 
     return liuyao_list
 
+def extract_changed_gua_details(changed_gua_data, changed_complete_analysis, method):
+    """专门为变卦提取六爻详细信息的函数"""
+    import streamlit as st
+    
+    liuyao_list = []
+    
+    # 获取爻线数据
+    lines = changed_gua_data.get('lines', [])
+    
+    # 调试信息
+    # st.write(f"变卦处理 - method: {method}, lines: {lines}")
+    
+    # 如果是铜钱起卦，需要反转爻线顺序
+    if method == 'coin':
+        # 铜钱起卦的爻线是反的，需要反转
+        lines = lines[::-1]
+        # st.write(f"铜钱起卦，反转后的lines: {lines}")
+    
+    # 处理爻线，从上到下（第6爻到第1爻）
+    for i, line in enumerate(lines):
+        line_num = 6 - i  # 第6爻到第1爻
+        yao_index = line_num - 1
+        
+        # 变卦中没有动爻概念，所有爻都是静爻
+        yao_info = build_yao_info(line_num, line, False, changed_complete_analysis, yao_index)
+        liuyao_list.append(yao_info)
+    
+    return liuyao_list
+
 def build_yao_info(line_num, line, is_dong, complete_analysis, yao_index):
     """构建单个爻的详细信息"""
     # 世应标记
@@ -108,7 +213,9 @@ def format_for_ai_analysis(extracted_data):
     basic_info = extracted_data["基本信息"]
     dong_yao_info = extracted_data["动爻信息"]
     liuyao_details = extracted_data["爻位分析"]
-    shi_ying = extracted_data["世应关系"]
+    ben_gua_shi_ying = extracted_data["世应关系"]  # 使用原来的键名
+    bian_gua_shi_ying = extracted_data["变卦世应关系"]
+    bian_gua_liuyao_details = extracted_data["变卦爻位分析"]
     
     formatted_text = f"""【六爻算卦完整信息】
 
@@ -122,19 +229,36 @@ def format_for_ai_analysis(extracted_data):
 {dong_yao_info["动爻描述"]}
 动爻数量：{dong_yao_info["动爻数量"]}个
 
-=== 世应关系 ===
-世爻：第{shi_ying["世爻位置"]}爻
-应爻：第{shi_ying["应爻位置"]}爻
+=== 本卦世应关系 ===
+世爻：第{ben_gua_shi_ying["世爻位置"]}爻
+应爻：第{ben_gua_shi_ying["应爻位置"]}爻
 
-=== 六爻详细配置 ==="""
+=== 本卦六爻详细配置 ==="""
     
-    # 添加每一爻的详细信息
+    # 添加本卦每一爻的详细信息
     for yao in liuyao_details:
         shi_ying_text = f"【{yao['世应']}】" if yao['世应'] else ""
         dong_text = "◄动爻" if yao['是否动爻'] else ""
         
         formatted_text += f"""
 第{yao['爻位']}爻：{yao['爻象']} | {yao['六神']} {yao['六亲']} {yao['纳甲地支']}({yao['五行']}) {shi_ying_text} {dong_text}"""
+    
+    # 添加变卦信息（如果有动爻）
+    if dong_yao_info["动爻数量"] > 0:
+        formatted_text += f"""
+
+=== 变卦世应关系 ===
+世爻：第{bian_gua_shi_ying["世爻位置"]}爻
+应爻：第{bian_gua_shi_ying["应爻位置"]}爻
+
+=== 变卦六爻详细配置 ==="""
+        
+        # 添加变卦每一爻的详细信息
+        for yao in bian_gua_liuyao_details:
+            shi_ying_text = f"【{yao['世应']}】" if yao['世应'] else ""
+            
+            formatted_text += f"""
+第{yao['爻位']}爻：{yao['爻象']} | {yao['六神']} {yao['六亲']} {yao['纳甲地支']}({yao['五行']}) {shi_ying_text}"""
     
     return formatted_text
 
@@ -157,5 +281,7 @@ def format_for_display(extracted_data):
 5. 五行生克：分析事物间的相互作用关系"""
     
     return formatted
+
+
 
 
